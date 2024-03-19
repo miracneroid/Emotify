@@ -50,7 +50,7 @@ python emotions.py --mode display
 * If found any error, download the whole structed project from my google-drive
 
 ```bash
-drive -> https://drive.google.com/drive/folders/1BungoJB2mxPyLGy6JUyBzOSJMIUVkuhR?usp=share_link
+drive -> https://drive.google.com/drive/folders/1W9JlTjq5G0kKuZV-Zmj0NSlZyzewpSCY?usp=share_link
 ```
 
 ## Data Preparation (optional)
