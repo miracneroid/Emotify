@@ -47,9 +47,7 @@ python emotions.py --mode display
 
 ![Accuracy plot](imgs/accuracy.png)
 
-* If found any error, download the whole structed project from my google-drive
-
-drive -> [click me](https://drive.google.com/drive/folders/1W9JlTjq5G0kKuZV-Zmj0NSlZyzewpSCY?usp=share_link)
+* If found any error, download the whole structed project from my google-drive -> [click me](https://drive.google.com/drive/folders/1W9JlTjq5G0kKuZV-Zmj0NSlZyzewpSCY?usp=share_link)
 
 
 ## Data Preparation (optional)
