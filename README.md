@@ -29,7 +29,7 @@ cd src
 python emotions.py --mode train
 ```
 
-* If you want to view the predictions without training again, you can download the pre-trained model from [here](https://drive.google.com/file/d/1FUn0XNOzf-nQV7QjbBPA6-8GLoHNNgv-/view?usp=sharing) and then run:  
+* If you want to view the predictions without training again, you can download the pre-trained model from [here](https://drive.google.com/file/d/1Ohtj9Zamv71mSNrjO9o_iMQuoT_nFPlQ/view?usp=share_link) and then run:  
 
 ```bash
 cd src
@@ -49,9 +49,8 @@ python emotions.py --mode display
 
 * If found any error, download the whole structed project from my google-drive
 
-```bash
-drive -> https://drive.google.com/drive/folders/1W9JlTjq5G0kKuZV-Zmj0NSlZyzewpSCY?usp=share_link
-```
+drive -> [click me](https://drive.google.com/drive/folders/1W9JlTjq5G0kKuZV-Zmj0NSlZyzewpSCY?usp=share_link)
+
 
 ## Data Preparation (optional)
 
