@@ -1,3 +1,6 @@
-numpy==1.22.0
-opencv-python==4.2.0.32
-tensorflow==2.9.3
+numpy
+opencv-python
+tensorflow
+matplotlib
+scipy
+pandas
