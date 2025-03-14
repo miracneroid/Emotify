@@ -42,9 +42,15 @@ Emotify/
 │   │── images/ # Contains image samples (ignored in .gitignore)
 │   │── emotions.py  # Emotion detection script
 │   │── action.py  # Action prediction script
+│   │── action_mapping.py
+│   │── actions.txt
 │   │── dataset_prepare.py  # Data preprocessing
-│   │── haarcascade_frontalface_default.xml  # Haar Cascade 
+│   │── haarcascade_frontalface_default.xml  # Haar Cascade
+│   │── load_mpii.py 
 │   │── model.h5  # Pre-trained model weights
+│   │── mpii_annotations.csv
+│   │── mpii_human_pose_v1_u12_1.mat
+
 ```
 ## Basic Usage
 
