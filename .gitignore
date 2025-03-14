@@ -1,0 +1,28 @@
+# Ignore dataset folders inside src/
+src/data/
+src/images/
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore model weights and large files
+*.h5
+*.ckpt
+*.tflite
+
+# Ignore logs and temp files
+logs/
+*.log
+*.csv
+*.tmp
+.DS_Store
+
+# Ignore Jupyter notebook checkpoints (if any)
+.ipynb_checkpoints/
+
+# Ignore virtual environment (if used)
+venv/
+.env
