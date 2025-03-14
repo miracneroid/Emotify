@@ -1,14 +1,51 @@
-# Emotion detection using deep learning
+# Emotion and Action Prediction using Deep Learning
 
 ## Introduction
 
-This project aims to classify the emotion on a person's face into one of **seven categories**, using deep convolutional neural networks. The model is trained on the **FER-2013** dataset which was published on International Conference on Machine Learning (ICML). This dataset consists of 35887 grayscale, 48x48 sized face images with **seven emotions** - angry, disgusted, fearful, happy, neutral, sad and surprised.
+This project aims to classify emotions and predict actions based on facial expressions using deep convolutional neural networks (CNNs) and machine learning models. The system is trained on the **FER-2013** dataset for emotion detection and the **EMOTIC** and **MPII Human Pose** datasets for action prediction.
+
+The model classifies a person's emotion into one of **seven categories** (angry, disgusted, fearful, happy, neutral, sad, and surprised) and predicts possible actions based on facial expressions and environmental context.
+
+## Features
+
+- **Emotion Detection**: Classifies facial expressions into seven emotions.
+- **Action Prediction**: Uses mapped datasets to predict potential actions based on detected emotions.
+- **Live Video Processing**: Real-time emotion and action recognition using webcam feed.
+- **Deep Learning Model Optimization**: Improved accuracy through dataset enhancements and hyperparameter tuning.
 
 ## Dependencies
 
-* Python 3, [OpenCV](https://opencv.org/), [Tensorflow](https://www.tensorflow.org/)
-* To install the required packages, run `pip install -r requirements.txt`.
+* Python 3
+* [OpenCV](https://opencv.org/)
+* [TensorFlow](https://www.tensorflow.org/)
+* [NumPy](https://numpy.org/)
+* [Matplolib](https://matplotlib.org)
+* [Scipy](https://scipy.org)
+* [Pandas](https://pandas.pydata.org)
 
+To install all dependencies, run:
+```bash
+pip install -r requirements.txt
+```
+
+## Directory Structure
+```bash
+Emotify/
+│── .gitignore
+│── README.md
+│── requirements.txt
+│── imgs/
+│── src/
+│   │── data/  # Contains datasets (ignored in .gitignore)
+        │── test/
+        │── train/
+│   │── images/ # Contains image samples (ignored in .gitignore)
+│   │── emotions.py  # Emotion detection script
+│   │── action.py  # Action prediction script
+│   │── dataset_prepare.py  # Data preprocessing
+│   │── haarcascade_frontalface_default.xml  # Haar Cascade 
+│   │── model.h5  # Pre-trained model weights
+```
 ## Basic Usage
 
 The repository is currently compatible with `tensorflow-2.0` and makes use of the Keras API using the `tensorflow.keras` library.
@@ -36,19 +73,9 @@ cd src
 python emotions.py --mode display
 ```
 
-* The folder structure is of the form:  
-  src:
-  * data (folder)
-  * `emotions.py` (file)
-  * `haarcascade_frontalface_default.xml` (file)
-  * `model.h5` (file)
-
 * This implementation by default detects emotions on all faces in the webcam feed. With a simple 4-layer CNN, the test accuracy reached 63.2% in 50 epochs.
 
 ![Accuracy plot](imgs/accuracy.png)
-
-* If found any error, download the whole structed project from my google-drive -> [click me](https://drive.google.com/drive/folders/1W9JlTjq5G0kKuZV-Zmj0NSlZyzewpSCY?usp=share_link)
-
 
 ## Data Preparation (optional)
 
@@ -73,3 +100,12 @@ python emotions.py --mode display
    X Wang, D Athanasakis, J Shawe-Taylor, M Milakov, J Park, R Ionescu,
    M Popescu, C Grozea, J Bergstra, J Xie, L Romaszko, B Xu, Z Chuang, and
    Y. Bengio. arXiv 2013.
+
+* FER2013 Dataset - Kaggle 
+* MPII Human Pose Dataset
+
+If you find any issues or need help, feel free to raise an issue or download the structured project from [Google Drive](https://drive.google.com/drive/folders/1W9JlTjq5G0kKuZV-Zmj0NSlZyzewpSCY?usp=share_link)
+
+```bash
+Let me know if you need any further modifications! 🚀
+```
