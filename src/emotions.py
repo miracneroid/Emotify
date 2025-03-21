@@ -2,6 +2,7 @@ import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 import cv2
+import mediapipe as mp
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
 from tensorflow.keras.optimizers import Adam
@@ -10,6 +11,10 @@ import os
 
 # Suppress TensorFlow warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+# Initialize MediaPipe Holistic for full-body tracking
+mp_holistic = mp.solutions.holistic
+mp_drawing = mp.solutions.drawing_utils
 
 # Command line argument
 ap = argparse.ArgumentParser()
@@ -33,7 +38,7 @@ def suggest_action(emotion):
     actions = [action for action, mapped_emotion in ACTION_TO_EMOTION.items() if mapped_emotion == emotion]
     return actions[0] if actions else "No action suggestion available"
 
-# Plots accuracy and loss curves
+# Function to plot accuracy and loss curves
 def plot_model_history(model_history):
     fig, axs = plt.subplots(1, 2, figsize=(15, 5))
     axs[0].plot(model_history.history['accuracy'])
@@ -60,7 +65,7 @@ batch_size = 64
 num_epoch = 50
 
 train_datagen = ImageDataGenerator(rescale=1./255)
-val_datagen = ImageDataGenerator(rescale=1./255)
+val_datagen = ImageDataGenerator(rescale=1./255) 
 
 train_generator = train_datagen.flow_from_directory(
     train_dir, target_size=(48, 48), batch_size=batch_size, color_mode="grayscale", class_mode='categorical')
@@ -102,29 +107,45 @@ elif mode == "display":
     emotion_dict = {i: EMOTIONS[i] for i in range(len(EMOTIONS))}
     cap = cv2.VideoCapture(0)
     
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-        facecasc = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = facecasc.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
-
-        for (x, y, w, h) in faces:
-            cv2.rectangle(frame, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
-            roi_gray = gray[y:y + h, x:x + w]
-            cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (48, 48)), -1), 0)
-            prediction = model.predict(cropped_img)
-            maxindex = int(np.argmax(prediction))
-            detected_emotion = emotion_dict[maxindex]
-            action_suggestion = suggest_action(detected_emotion)
+    with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
             
-            cv2.putText(frame, f"{detected_emotion} ({action_suggestion})", (x+20, y-60),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-        
-        cv2.imshow('Video', cv2.resize(frame, (1600, 960), interpolation=cv2.INTER_CUBIC))
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+            # Convert to RGB for MediaPipe
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            results = holistic.process(rgb_frame)
+
+            # Convert back to BGR for OpenCV
+            frame = cv2.cvtColor(rgb_frame, cv2.COLOR_RGB2BGR)
+
+            # Draw pose, face, hand landmarks
+            mp_drawing.draw_landmarks(frame, results.face_landmarks, mp_holistic.FACEMESH_CONTOURS)
+            mp_drawing.draw_landmarks(frame, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
+            mp_drawing.draw_landmarks(frame, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+            mp_drawing.draw_landmarks(frame, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
+
+            # Face detection for emotion analysis
+            facecasc = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            faces = facecasc.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
+
+            for (x, y, w, h) in faces:
+                cv2.rectangle(frame, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
+                roi_gray = gray[y:y + h, x:x + w]
+                cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (48, 48)), -1), 0)
+                prediction = model.predict(cropped_img)
+                maxindex = int(np.argmax(prediction))
+                detected_emotion = emotion_dict[maxindex]
+                action_suggestion = suggest_action(detected_emotion)
+
+                cv2.putText(frame, f"{detected_emotion} ({action_suggestion})", (x+20, y-60),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
+            cv2.imshow('Emotion & Action Tracking', cv2.resize(frame, (1600, 960), interpolation=cv2.INTER_CUBIC))
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
     cap.release()
     cv2.destroyAllWindows()

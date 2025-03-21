@@ -1,19 +1,35 @@
-import action_mapping
+import cv2
+import mediapipe as mp
 
-def map_actions_to_emotions(actions):
-    """Maps a list of actions to their corresponding emotions."""
-    action_emotion_pairs = {}
+# Initialize MediaPipe Pose Estimation
+mp_pose = mp.solutions.pose
+pose = mp_pose.Pose()
 
-    for action in actions:
-        emotion = action_mapping.get_emotion_for_action(action)
-        action_emotion_pairs[action] = emotion
+cap = cv2.VideoCapture(0)
 
-    return action_emotion_pairs
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
 
-# Example Usage
-if __name__ == "__main__":
-    sample_actions = ["dancing", "crying", "jumping with joy", "fighting", "laughing"]
-    mapped_results = map_actions_to_emotions(sample_actions)
+    # Convert to RGB (MediaPipe requires RGB format)
+    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    
+    # Detect Pose
+    results = pose.process(rgb_frame)
 
-    for action, emotion in mapped_results.items():
-        print(f"Action: {action} → Emotion: {emotion}")
+    if results.pose_landmarks:
+        for lm in results.pose_landmarks.landmark:
+            h, w, _ = frame.shape
+            x, y = int(lm.x * w), int(lm.y * h)
+            cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)
+
+    # Show Frame
+    cv2.imshow("Action Prediction", frame)
+
+    # Break on 'q' key
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
