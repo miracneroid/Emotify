@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This project aims to classify emotions and predict actions based on facial expressions using deep convolutional neural networks (CNNs) and machine learning models. The system is trained on the **FER-2013** dataset for emotion detection and the **EMOTIC** and **MPII Human Pose** datasets for action prediction.
+This project aims to classify emotions and predict actions based on facial expressions and enviromental analysis using deep convolutional neural networks (CNNs) and machine learning models. The system is trained on the **FER-2013** dataset for emotion detection and the **EMOTIC** and **MPII Human Pose** datasets for action prediction.
 
 The model classifies a person's emotion into one of **seven categories** (angry, disgusted, fearful, happy, neutral, sad, and surprised) and predicts possible actions based on facial expressions and environmental context.
 
