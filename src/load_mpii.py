@@ -39,3 +39,10 @@ else:
             f.write(action + "\n")
 
     print(f"\nTotal unique actions found: {len(valid_actions)}")
+
+    output_json = os.path.join(script_dir, "mpii_actions_summary.json")
+    import json
+    action_records = [{"id": idx, "action": act} for idx, act in enumerate(valid_actions)]
+    with open(output_json, "w") as f:
+        json.dump(action_records[:500], f, indent=2)
+    print(f"Exported summary to '{output_json}'.")
