@@ -96,6 +96,11 @@ class PoseActionClassifier:
                 action = "Victory / Raising Hands"
                 confidence = 0.85
 
+        elif (l_wrist[1] < nose[1] and r_wrist[1] > shoulder_mid_y) or \
+             (r_wrist[1] < nose[1] and l_wrist[1] > shoulder_mid_y):
+            action = "Waving / Raised Hand"
+            confidence = 0.88
+
         if movement_velocity > 0.05 or abs(l_knee_angle - r_knee_angle) > 25:
             action = "Walking / Running"
             confidence = 0.80
