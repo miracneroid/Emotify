@@ -88,6 +88,14 @@ class PoseActionClassifier:
         action = "Standing / Idle"
         confidence = 0.70
 
+        if l_wrist[1] < shoulder_mid_y and r_wrist[1] < shoulder_mid_y:
+            if l_wrist[1] < nose[1] or r_wrist[1] < nose[1]:
+                action = "Arms Raised / Celebrating"
+                confidence = 0.92
+            else:
+                action = "Victory / Raising Hands"
+                confidence = 0.85
+
         if movement_velocity > 0.05 or abs(l_knee_angle - r_knee_angle) > 25:
             action = "Walking / Running"
             confidence = 0.80
