@@ -116,6 +116,10 @@ class PoseActionClassifier:
             action = "Defensive / Cowering"
             confidence = 0.82
 
+        elif l_hip_angle < 135 and r_hip_angle < 135 and l_knee_angle < 135 and r_knee_angle < 135:
+            action = "Sitting / Resting"
+            confidence = 0.89
+
         if movement_velocity > 0.05 or abs(l_knee_angle - r_knee_angle) > 25:
             action = "Walking / Running"
             confidence = 0.80
