@@ -1,16 +1,24 @@
 # action_mapping.py
 
-# Define a dictionary to map actions to emotions
 ACTION_TO_EMOTION = {
     "dancing": "happy",
     "crying": "sad",
     "fighting": "angry",
+    "fighting / punching stance": "angry",
     "hiding": "fear",
+    "defensive / cowering": "fear",
     "jumping with joy": "happy",
+    "arms raised / celebrating": "happy",
+    "victory / raising hands": "happy",
+    "waving / raised hand": "happy",
     "sitting quietly": "neutral",
+    "sitting / resting": "neutral",
+    "standing / idle": "neutral",
     "surprised reaction": "surprise",
+    "hands on head / distressed": "fear",
     "playing an instrument": "neutral",
     "running away": "fear",
+    "walking / running": "neutral",
     "shouting": "angry",
     "laughing": "happy",
     "walking slowly": "neutral",
@@ -19,5 +27,4 @@ ACTION_TO_EMOTION = {
 }
 
 def get_emotion_for_action(action):
-    """Returns the emotion mapped to an action. If not found, return 'neutral'."""
     return ACTION_TO_EMOTION.get(action.lower(), "neutral")
