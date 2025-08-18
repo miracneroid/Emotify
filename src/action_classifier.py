@@ -101,6 +101,11 @@ class PoseActionClassifier:
             action = "Waving / Raised Hand"
             confidence = 0.88
 
+        elif (l_wrist[1] < nose[1] and math.hypot(l_wrist[0] - nose[0], l_wrist[1] - nose[1]) < 0.15) and \
+             (r_wrist[1] < nose[1] and math.hypot(r_wrist[0] - nose[0], r_wrist[1] - nose[1]) < 0.15):
+            action = "Hands on Head / Distressed"
+            confidence = 0.90
+
         if movement_velocity > 0.05 or abs(l_knee_angle - r_knee_angle) > 25:
             action = "Walking / Running"
             confidence = 0.80
