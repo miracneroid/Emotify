@@ -106,6 +106,16 @@ class PoseActionClassifier:
             action = "Hands on Head / Distressed"
             confidence = 0.90
 
+        elif (l_arm_angle < 110 or r_arm_angle < 110) and \
+             (abs(l_wrist[1] - l_shoulder[1]) < 0.2 and abs(r_wrist[1] - r_shoulder[1]) < 0.2) and \
+             movement_velocity > 0.04:
+            action = "Fighting / Punching Stance"
+            confidence = 0.86
+
+        elif (l_knee_angle < 140 or r_knee_angle < 140) and wrist_mid_y < shoulder_mid_y + 0.1:
+            action = "Defensive / Cowering"
+            confidence = 0.82
+
         if movement_velocity > 0.05 or abs(l_knee_angle - r_knee_angle) > 25:
             action = "Walking / Running"
             confidence = 0.80
