@@ -41,3 +41,30 @@ EMOTION_TO_ACTIONS = {
 
 def get_actions_for_emotion(emotion):
     return EMOTION_TO_ACTIONS.get(emotion.lower(), ["standing / idle"])
+
+def combine_emotion_and_action(facial_emotion, pose_action):
+    facial_emotion = facial_emotion.lower() if facial_emotion else "neutral"
+    pose_action_key = pose_action.lower() if pose_action else "standing / idle"
+    expected_emotion = ACTION_TO_EMOTION.get(pose_action_key, "neutral")
+
+    if facial_emotion == expected_emotion:
+        correlation = "High Alignment"
+        refined_description = f"{pose_action} (Aligned with {facial_emotion.capitalize()})"
+        confidence_boost = 0.15
+    elif expected_emotion == "neutral" or facial_emotion == "neutral":
+        correlation = "Moderate Alignment"
+        refined_description = f"{pose_action} [{facial_emotion.capitalize()}]"
+        confidence_boost = 0.05
+    else:
+        correlation = "Divergent State"
+        refined_description = f"{pose_action} (Facial state: {facial_emotion.capitalize()})"
+        confidence_boost = 0.0
+
+    return {
+        "facial_emotion": facial_emotion,
+        "pose_action": pose_action,
+        "expected_emotion": expected_emotion,
+        "correlation": correlation,
+        "refined_description": refined_description,
+        "confidence_boost": confidence_boost
+    }
