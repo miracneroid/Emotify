@@ -1,35 +1,33 @@
 import cv2
 import mediapipe as mp
+import argparse
+import sys
+import os
 
-# Initialize MediaPipe Pose Estimation
-mp_pose = mp.solutions.pose
-pose = mp_pose.Pose()
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from action_classifier import PoseActionClassifier
+from action_mapping import get_emotion_for_action
 
-cap = cv2.VideoCapture(0)
+def main():
+    parser = argparse.ArgumentParser(description="Real-Time Pose-Based Action Prediction Engine")
+    parser.add_argument("--source", default="0", help="Video source (camera index or path to video file)")
+    args = parser.parse_args()
 
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
+    video_source = int(args.source) if args.source.isdigit() else args.source
 
-    # Convert to RGB (MediaPipe requires RGB format)
-    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    
-    # Detect Pose
-    results = pose.process(rgb_frame)
+    mp_pose = mp.solutions.pose
+    pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+    classifier = PoseActionClassifier()
 
-    if results.pose_landmarks:
-        for lm in results.pose_landmarks.landmark:
-            h, w, _ = frame.shape
-            x, y = int(lm.x * w), int(lm.y * h)
-            cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)
+    cap = cv2.VideoCapture(video_source)
+    if not cap.isOpened():
+        print(f"Error: Could not open video source: {video_source}")
+        return
 
-    # Show Frame
-    cv2.imshow("Action Prediction", frame)
+    print("Starting Action Prediction HUD...")
+    cap.release()
+    cv2.destroyAllWindows()
+    pose.close()
 
-    # Break on 'q' key
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
+if __name__ == "__main__":
+    main()
