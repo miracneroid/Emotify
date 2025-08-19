@@ -28,3 +28,16 @@ ACTION_TO_EMOTION = {
 
 def get_emotion_for_action(action):
     return ACTION_TO_EMOTION.get(action.lower(), "neutral")
+
+EMOTION_TO_ACTIONS = {
+    "happy": ["dancing", "jumping with joy", "arms raised / celebrating", "waving / raised hand", "laughing", "playing sports"],
+    "sad": ["crying", "hands on head / distressed", "sitting quietly", "walking slowly"],
+    "angry": ["fighting", "fighting / punching stance", "shouting"],
+    "fear": ["hiding", "defensive / cowering", "hands on head / distressed", "running away"],
+    "surprise": ["surprised reaction", "victory / raising hands"],
+    "neutral": ["standing / idle", "sitting / resting", "walking / running", "working out"],
+    "disgust": ["defensive / cowering", "sitting quietly"]
+}
+
+def get_actions_for_emotion(emotion):
+    return EMOTION_TO_ACTIONS.get(emotion.lower(), ["standing / idle"])
