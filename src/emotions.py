@@ -9,36 +9,24 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 
-# Suppress TensorFlow warnings
+from action_classifier import PoseActionClassifier
+from action_mapping import combine_emotion_and_action, get_actions_for_emotion, ACTION_TO_EMOTION
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-# Initialize MediaPipe Holistic for full-body tracking
 mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
 
-# Command line argument
 ap = argparse.ArgumentParser()
 ap.add_argument("--mode", help="train/display")
 mode = ap.parse_args().mode
 
-# Define possible emotions from FER-2013 dataset
 EMOTIONS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
 
-# Action mapping based on emotions
-ACTION_TO_EMOTION = {
-    "smiling": "happy",
-    "crying": "sad",
-    "jumping with joy": "happy",
-    "fighting": "angry",
-    "laughing": "happy"
-}
-
 def suggest_action(emotion):
-    """Suggests an action based on detected emotion."""
-    actions = [action for action, mapped_emotion in ACTION_TO_EMOTION.items() if mapped_emotion == emotion]
-    return actions[0] if actions else "No action suggestion available"
+    actions = get_actions_for_emotion(emotion)
+    return actions[0] if actions else "standing / idle"
 
-# Function to plot accuracy and loss curves
 def plot_model_history(model_history):
     fig, axs = plt.subplots(1, 2, figsize=(15, 5))
     axs[0].plot(model_history.history['accuracy'])
@@ -56,7 +44,6 @@ def plot_model_history(model_history):
     axs[1].legend(['train', 'val'], loc='best')
     plt.show()
 
-# Define data generators
 train_dir = 'data/train'
 val_dir = 'data/test'
 num_train = 28709
@@ -73,7 +60,6 @@ train_generator = train_datagen.flow_from_directory(
 validation_generator = val_datagen.flow_from_directory(
     val_dir, target_size=(48, 48), batch_size=batch_size, color_mode="grayscale", class_mode='categorical')
 
-# Create CNN model
 model = Sequential([
     Conv2D(32, (3, 3), activation='relu', input_shape=(48, 48, 1)),
     Conv2D(64, (3, 3), activation='relu'),
@@ -102,6 +88,7 @@ if mode == "train":
     model.save_weights('model.h5')
 
 elif mode == "display":
+    pose_classifier = PoseActionClassifier()
     model.load_weights('model.h5')
     cv2.ocl.setUseOpenCL(False)
     emotion_dict = {i: EMOTIONS[i] for i in range(len(EMOTIONS))}
@@ -113,20 +100,19 @@ elif mode == "display":
             if not ret:
                 break
             
-            # Convert to RGB for MediaPipe
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             results = holistic.process(rgb_frame)
-
-            # Convert back to BGR for OpenCV
             frame = cv2.cvtColor(rgb_frame, cv2.COLOR_RGB2BGR)
 
-            # Draw pose, face, hand landmarks
-            #mp_drawing.draw_landmarks(frame, results.face_landmarks, mp_holistic.FACEMESH_CONTOURS)
             mp_drawing.draw_landmarks(frame, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
             mp_drawing.draw_landmarks(frame, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
             mp_drawing.draw_landmarks(frame, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
 
-            # Face detection for emotion analysis
+            pose_action_name = "Standing / Idle"
+            if results.pose_landmarks:
+                pose_pred = pose_classifier.classify(results.pose_landmarks.landmark)
+                pose_action_name = pose_pred["action"]
+
             facecasc = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             faces = facecasc.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
@@ -135,15 +121,17 @@ elif mode == "display":
                 cv2.rectangle(frame, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
                 roi_gray = gray[y:y + h, x:x + w]
                 cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (48, 48)), -1), 0)
-                prediction = model.predict(cropped_img)
+                prediction = model.predict(cropped_img, verbose=0)
                 maxindex = int(np.argmax(prediction))
                 detected_emotion = emotion_dict[maxindex]
-                action_suggestion = suggest_action(detected_emotion)
+                
+                multimodal = combine_emotion_and_action(detected_emotion, pose_action_name)
+                display_label = f"{detected_emotion.upper()} | {multimodal['refined_description']}"
 
-                cv2.putText(frame, f"{detected_emotion} ({action_suggestion})", (x+20, y-60),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+                cv2.putText(frame, display_label, (x, max(y - 20, 30)),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 255), 2, cv2.LINE_AA)
 
-            cv2.imshow('Emotion & Action Tracking', cv2.resize(frame, (1600, 960), interpolation=cv2.INTER_CUBIC))
+            cv2.imshow('Emotify - Multimodal Emotion & Action Tracking', cv2.resize(frame, (1600, 960), interpolation=cv2.INTER_CUBIC))
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
